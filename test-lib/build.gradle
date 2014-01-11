@@ -29,7 +29,8 @@ android {
     }
 
     release {
-        runProguard true
+        // Disable ProGuard to resolve bad RuntimeInvisibleParameterAnnotations error
+        // runProguard true
         proguardFile getDefaultProguardFile('proguard-android-optimize.txt')
         proguardFile 'proguard-project.txt'
     }
