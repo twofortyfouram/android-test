@@ -36,7 +36,6 @@ android {
     }
 }
 
-// TODO: Remove BuildConfig and R classes.
 android.libraryVariants.all { variant ->
     task("generate${variant.name}Javadoc", type: Javadoc) {
         description "Generates Javadoc for $variant.name."
