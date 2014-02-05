@@ -25,7 +25,7 @@ The build.gradle repositories section would look something like the following:
 And the dependencies section would look something like this:
     
     dependencies {
-        instrumentTestCompile group:'com.twofortyfouram', name:'android-test', version:'1.0.1+', ext:'aar'
+        instrumentTestCompile group:'com.twofortyfouram', name:'android-test', version:'1.+'
     }
 
 ## Ant
