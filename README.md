@@ -18,15 +18,11 @@ The library is published as an artifact to the two forty four a.m. maven reposit
 The build.gradle repositories section would look something like the following:
 
     repositories {
-        mavenCentral()
         maven { url 'https://dl.bintray.com/twofortyfouram/maven' }
     }
 
 And the dependencies section would look something like this:
     
     dependencies {
-        instrumentTestCompile group:'com.twofortyfouram', name:'android-test', version:'1.+'
+        instrumentTestCompile group:'com.twofortyfouram', name:'android-test', version:'[1.0.2,2.0['
     }
-
-## Ant
-Download the JAR from the Github releases page and include it in the libs/ directory of the Android Ant project.

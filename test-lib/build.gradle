@@ -1,14 +1,10 @@
 apply plugin: 'android-library'
 apply plugin: 'maven'
 
-repositories {
-    maven { url 'https://dl.bintray.com/twofortyfouram/maven' }
-    mavenCentral()
-}
-
 dependencies {
-    compile group:'com.twofortyfouram', name:'android-annotation', version:'1.+'
+    compile fileTree(dir: 'libs', include: ['*.jar', '*.aar'])
     compile group:'net.jcip', name:'jcip-annotations', version:'1.0'
+    compile group:'com.twofortyfouram', name:'android-annotation', version:'[1.0.2,2.0['
 }
 
 android {
@@ -21,18 +17,6 @@ android {
         versionCode Integer.parseInt(ANDROID_VERSION_CODE)
         versionName ANDROID_VERSION_NAME
         consumerProguardFiles 'proguard-consumer.txt'
-    }
-
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_7
-        targetCompatibility JavaVersion.VERSION_1_7
-    }
-
-    release {
-        // Disable ProGuard to resolve bad RuntimeInvisibleParameterAnnotations error
-        // runProguard true
-        proguardFile getDefaultProguardFile('proguard-android-optimize.txt')
-        proguardFile 'proguard-project.txt'
     }
 }
 
