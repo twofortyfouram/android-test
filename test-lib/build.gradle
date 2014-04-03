@@ -24,8 +24,9 @@ android.libraryVariants.all { variant ->
     task("generate${variant.name.capitalize()}Javadoc", type: Javadoc) {
         description "Generates Javadoc for $variant.name."
         source = variant.javaCompile.source
-        ext.androidJar = "${android.plugin.sdkDirectory}/platforms/${android.compileSdkVersion}/android.jar"
-        classpath = files(variant.javaCompile.classpath.files) + files(ext.androidJar)
+        classpath = files(variant.javaCompile.classpath.files) + files("${android.plugin.sdkDirectory}/platforms/${android.compileSdkVersion}/android.jar")
+        options.linksOffline('http://developer.android.com/reference/', "${android.plugin.sdkDirectory}/docs/reference")
+        options.links('http://jcip.net.s3-website-us-east-1.amazonaws.com/annotations/doc/', 'http://twofortyfouram.github.io/android-annotation/')
     }
 }
 
@@ -48,5 +49,17 @@ uploadArchives {
             pom.version = ANDROID_VERSION_NAME
             pom.artifactId = MAVEN_ARTIFACT_NAME
         }
+    }
+}
+
+// Workaround for naming conflict between maven and android plugins
+// http://stackoverflow.com/questions/18559932/gradle-maven-plugin-install-task-does-not-work-with-android-library-project
+task installArchives(type: Upload) {
+    description "Installs artifacts to mavenLocal."
+    repositories.mavenInstaller {
+        configuration = configurations.default
+        pom.groupId = MAVEN_GROUP
+        pom.artifactId = MAVEN_ARTIFACT_NAME
+        pom.version = ANDROID_VERSION_NAME
     }
 }
