@@ -15,7 +15,6 @@
 
 package com.twofortyfouram.test.context;
 
-import com.twofortyfouram.annotation.NonNull;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
@@ -24,7 +23,7 @@ import android.test.suitebuilder.annotation.SmallTest;
 
 public final class FeatureContextWrapperTest extends AndroidTestCase {
 
-    @NonNull
+    @SmallTest
     public void testBreakOut() {
         final FeatureContextWrapper fContext = new FeatureContextWrapper(getContext(), null, null);
 

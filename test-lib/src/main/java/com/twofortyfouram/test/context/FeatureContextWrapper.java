@@ -15,14 +15,14 @@
 
 package com.twofortyfouram.test.context;
 
-import com.twofortyfouram.annotation.NonNull;
-import com.twofortyfouram.annotation.Nullable;
 
 import net.jcip.annotations.Immutable;
 
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.pm.PackageManager;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.test.mock.MockPackageManager;
 
 import java.util.Arrays;

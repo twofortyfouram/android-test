@@ -15,8 +15,6 @@
 
 package com.twofortyfouram.test.context;
 
-import com.twofortyfouram.annotation.NonNull;
-import com.twofortyfouram.annotation.Nullable;
 
 import net.jcip.annotations.Immutable;
 import net.jcip.annotations.NotThreadSafe;
@@ -28,6 +26,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.UserHandle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import java.util.Collection;
 import java.util.LinkedList;

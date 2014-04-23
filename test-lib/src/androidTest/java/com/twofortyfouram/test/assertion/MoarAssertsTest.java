@@ -15,6 +15,7 @@
 
 package com.twofortyfouram.test.assertion;
 
+import junit.framework.AssertionFailedError;
 import junit.framework.TestCase;
 
 import android.test.suitebuilder.annotation.SmallTest;
@@ -31,7 +32,9 @@ public final class MoarAssertsTest extends TestCase {
         try {
             MoarAsserts.assertNoninstantiable(InstantiableClass.class);
             fail();
-        } catch (AssertionError e) {
+        } catch (final AssertionFailedError e) {
+            // Expected exception
+        } catch (final AssertionError e) {
             // Expected exception
         }
     }

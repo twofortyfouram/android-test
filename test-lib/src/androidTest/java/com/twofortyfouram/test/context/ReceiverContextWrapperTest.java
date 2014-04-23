@@ -15,7 +15,6 @@
 
 package com.twofortyfouram.test.context;
 
-import com.twofortyfouram.annotation.NonNull;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -38,14 +37,14 @@ public final class ReceiverContextWrapperTest extends AndroidTestCase {
 
     // TODO: These tests are not particularly DRY
 
-    @NonNull
+    @SmallTest
     public void testBreakOut() {
         final ReceiverContextWrapper fContext = new ReceiverContextWrapper(getContext());
 
         assertSame(fContext, fContext.getApplicationContext());
     }
 
-    @NonNull
+    @SmallTest
     public void testGetAndClearEmpty() {
         final ReceiverContextWrapper fContext = new ReceiverContextWrapper(getContext());
 

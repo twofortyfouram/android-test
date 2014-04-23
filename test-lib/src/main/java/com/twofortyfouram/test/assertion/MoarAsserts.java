@@ -15,12 +15,11 @@
 
 package com.twofortyfouram.test.assertion;
 
-import com.twofortyfouram.annotation.NonNull;
-
 import junit.framework.Assert;
 
 import net.jcip.annotations.ThreadSafe;
 
+import android.support.annotation.NonNull;
 import android.test.MoreAsserts;
 
 import java.lang.reflect.Constructor;
