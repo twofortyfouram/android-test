@@ -18,6 +18,7 @@ package com.twofortyfouram.test.context;
 
 import net.jcip.annotations.Immutable;
 
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.pm.PackageManager;
@@ -84,6 +85,18 @@ public final class FeatureContextWrapper extends ContextWrapper {
             @Override
             public boolean hasSystemFeature(final String featureName) {
                 return checkFeatureInternal(featureName);
+            }
+
+            @Override
+            public void setComponentEnabledSetting(ComponentName componentName, int newState,
+                    int flags) {
+                baseContext.getPackageManager().setComponentEnabledSetting(componentName, newState,
+                        flags);
+            }
+
+            @Override
+            public int getComponentEnabledSetting(ComponentName componentName) {
+                return baseContext.getPackageManager().getComponentEnabledSetting(componentName);
             }
         };
     }
