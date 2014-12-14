@@ -13,16 +13,23 @@ The library is compatible and optimized for Android API Level 8 and above.
 
 # Download
 ## Gradle
-The library is published as an artifact to the two forty four a.m. maven repository.  To use the library, the two forty four a.m. maven repository and the artifact need to be added to your build script.
+The library is published as an artifact to jCenter.  To use the library, the jCenter repository and the artifact need to be added to your build script.
 
 The build.gradle repositories section would look something like the following:
 
     repositories {
-        maven { url 'https://dl.bintray.com/twofortyfouram/maven' }
+        jcenter()
     }
 
 And the dependencies section would look something like this:
     
     dependencies {
-        instrumentTestCompile group:'com.twofortyfouram', name:'android-test', version:'[1.0.2,2.0['
+        androidTestCompile group:'com.twofortyfouram', name:'android-test', version:'[1.0.5,2.0['
     }
+
+
+# History
+* 1.0.0: Initial release
+* 1.0.1: Disable running ProGuard, to fix RuntimeInvisibleParameterAnnotations error
+* 1.0.2: Update Android Gradle plugin, which changed the generated BuildConfig
+* 1.0.5: Reupload artifacts with source and JavaDoc for inclusion in jCenter
