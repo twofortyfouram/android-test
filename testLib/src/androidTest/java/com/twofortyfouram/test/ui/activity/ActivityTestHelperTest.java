@@ -15,70 +15,95 @@
 
 package com.twofortyfouram.test.ui.activity;
 
-import com.twofortyfouram.test.assertion.MoarAsserts;
-
 import android.app.Activity;
 import android.content.Intent;
+import android.support.annotation.NonNull;
 import android.test.ActivityInstrumentationTestCase2;
 import android.test.UiThreadTest;
 import android.test.suitebuilder.annotation.SmallTest;
 
+import com.twofortyfouram.test.ActivityImpl;
+import com.twofortyfouram.test.assertion.MoarAsserts;
 
+// TODO: Convert this to Espresso style
 public final class ActivityTestHelperTest
-        extends ActivityInstrumentationTestCase2<FragmentTestActivity> {
+        extends ActivityInstrumentationTestCase2<ActivityImpl> {
 
-    public ActivityTestHelperTest(
-            Class<FragmentTestActivity> activityClass) {
+    public ActivityTestHelperTest() {
+        super(ActivityImpl.class);
+    }
+
+    public ActivityTestHelperTest(@NonNull final Class<ActivityImpl> activityClass) {
         super(activityClass);
     }
 
     @SmallTest
     @UiThreadTest
     public void testResultCanceled() {
-        final FragmentTestActivity activity = getActivity();
+        final ActivityImpl activity = getActivity();
 
         activity.setResult(Activity.RESULT_CANCELED);
 
         activity.finish();
 
-        assertEquals(Activity.RESULT_CANCELED, ActivityTestUtil.getActivityResultCode(activity));
+        assertEquals(Activity.RESULT_CANCELED,
+                ActivityTestUtil.getActivityResultCodeSync(getInstrumentation(), activity));
     }
 
     @SmallTest
     @UiThreadTest
-    public void testResultOk() {
-        final FragmentTestActivity activity = getActivity();
+    public void testResultOk_ui_thread() {
+        final ActivityImpl activity = getActivity();
 
         activity.setResult(Activity.RESULT_OK);
 
         activity.finish();
 
-        assertEquals(Activity.RESULT_OK, ActivityTestUtil.getActivityResultCode(activity));
+        assertEquals(Activity.RESULT_OK,
+                ActivityTestUtil.getActivityResultCodeSync(getInstrumentation(), activity));
+    }
+
+    @SmallTest
+    public void testResultOk_non_ui_thread() throws Throwable {
+        final ActivityImpl activity = getActivity();
+
+        ActivityTestUtil.autoSyncRunnable(getInstrumentation(), new Runnable() {
+            @Override
+            public void run() {
+                activity.setResult(Activity.RESULT_OK);
+
+                activity.finish();
+            }
+        });
+
+        assertEquals(Activity.RESULT_OK,
+                ActivityTestUtil.getActivityResultCodeSync(getInstrumentation(), activity));
     }
 
     @SmallTest
     @UiThreadTest
     public void testResultIntent_null() {
-        final FragmentTestActivity activity = getActivity();
+        final ActivityImpl activity = getActivity();
 
         activity.setResult(Activity.RESULT_OK, null);
 
         activity.finish();
 
-        assertNull(ActivityTestUtil.getActivityResultData(activity));
+        assertNull(ActivityTestUtil.getActivityResultDataSync(getInstrumentation(), activity));
     }
 
     @SmallTest
     @UiThreadTest
     public void testResultIntent_non_null() {
-        final FragmentTestActivity activity = getActivity();
+        final ActivityImpl activity = getActivity();
 
         final Intent result = new Intent();
         activity.setResult(Activity.RESULT_OK, result);
 
         activity.finish();
 
-        assertSame(result, ActivityTestUtil.getActivityResultData(activity));
+        assertSame(result, ActivityTestUtil.getActivityResultDataSync(getInstrumentation(),
+                activity));
     }
 
     @SmallTest

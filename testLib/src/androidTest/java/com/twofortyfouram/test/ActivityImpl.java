@@ -13,13 +13,13 @@
  * limitations under the License.
  */
 
-package com.twofortyfouram.test.ui.activity;
+package com.twofortyfouram.test;
 
 import android.app.Activity;
 
 /**
- * Activity to host Fragments during testing.
+ * Activity implementation to exercise during tests.
  */
-public class FragmentTestActivity extends Activity {
+public class ActivityImpl extends Activity {
     // this space intentionally left blank
 }

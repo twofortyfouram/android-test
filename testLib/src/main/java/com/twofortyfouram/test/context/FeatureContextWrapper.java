@@ -16,8 +16,6 @@
 package com.twofortyfouram.test.context;
 
 
-import net.jcip.annotations.Immutable;
-
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.ContextWrapper;
@@ -25,6 +23,8 @@ import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.test.mock.MockPackageManager;
+
+import net.jcip.annotations.Immutable;
 
 import java.util.Arrays;
 

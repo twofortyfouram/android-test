@@ -15,10 +15,10 @@
 
 package com.twofortyfouram.test.assertion;
 
+import android.test.suitebuilder.annotation.SmallTest;
+
 import junit.framework.AssertionFailedError;
 import junit.framework.TestCase;
-
-import android.test.suitebuilder.annotation.SmallTest;
 
 public final class MoarAssertsTest extends TestCase {
 
