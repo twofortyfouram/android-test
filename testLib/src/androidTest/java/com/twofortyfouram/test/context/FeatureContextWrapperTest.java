@@ -17,7 +17,10 @@ package com.twofortyfouram.test.context;
 
 
 import android.Manifest;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.os.Build;
+import android.support.test.filters.SdkSuppress;
 import android.test.AndroidTestCase;
 import android.test.suitebuilder.annotation.SmallTest;
 
@@ -25,14 +28,16 @@ public final class FeatureContextWrapperTest extends AndroidTestCase {
 
     @SmallTest
     public void testBreakOut() {
-        final FeatureContextWrapper fContext = new FeatureContextWrapper(getContext(), null, null);
+        final FeatureContextWrapper fContext = new FeatureContextWrapper(getContext(), null, null,
+                null);
 
         assertSame(fContext, fContext.getApplicationContext());
     }
 
     @SmallTest
     public void testAllowedFeature_null() {
-        final FeatureContextWrapper fContext = new FeatureContextWrapper(getContext(), null, null);
+        final FeatureContextWrapper fContext = new FeatureContextWrapper(getContext(), null, null,
+                null);
 
         assertFalse(fContext.getPackageManager()
                 .hasSystemFeature(PackageManager.FEATURE_LIVE_WALLPAPER));
@@ -40,7 +45,7 @@ public final class FeatureContextWrapperTest extends AndroidTestCase {
 
     @SmallTest
     public void testAllowedFeature_empty() {
-        final FeatureContextWrapper fContext = new FeatureContextWrapper(getContext(), null,
+        final FeatureContextWrapper fContext = new FeatureContextWrapper(getContext(), null, null,
                 new String[0]);
 
         assertFalse(fContext.getPackageManager()
@@ -50,7 +55,7 @@ public final class FeatureContextWrapperTest extends AndroidTestCase {
     @SmallTest
     public void testAllowedFeature() {
         final FeatureContextWrapper fContext = new FeatureContextWrapper(getContext(),
-                null, new String[]{PackageManager.FEATURE_LIVE_WALLPAPER});
+                null, null, new String[]{PackageManager.FEATURE_LIVE_WALLPAPER});
 
         assertTrue(fContext.getPackageManager()
                 .hasSystemFeature(PackageManager.FEATURE_LIVE_WALLPAPER));
@@ -60,7 +65,8 @@ public final class FeatureContextWrapperTest extends AndroidTestCase {
 
     @SmallTest
     public void testAllowedPermission_null() {
-        final FeatureContextWrapper fContext = new FeatureContextWrapper(getContext(), null, null);
+        final FeatureContextWrapper fContext = new FeatureContextWrapper(getContext(), null, null,
+                null);
 
         assertEquals(PackageManager.PERMISSION_DENIED, fContext.getPackageManager()
                 .checkPermission(Manifest.permission.ACCESS_FINE_LOCATION,
@@ -72,7 +78,7 @@ public final class FeatureContextWrapperTest extends AndroidTestCase {
     @SmallTest
     public void testAllowedPermission_empty() {
         final FeatureContextWrapper fContext = new FeatureContextWrapper(getContext(),
-                new String[0], null);
+                null, new String[0], null);
 
         assertEquals(PackageManager.PERMISSION_DENIED, fContext.getPackageManager()
                 .checkPermission(Manifest.permission.ACCESS_FINE_LOCATION,
@@ -84,7 +90,7 @@ public final class FeatureContextWrapperTest extends AndroidTestCase {
     @SmallTest
     public void testAllowedPermission() {
         final FeatureContextWrapper fContext = new FeatureContextWrapper(getContext(),
-                new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, null);
+                null, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, null);
 
         assertEquals(PackageManager.PERMISSION_GRANTED, fContext.getPackageManager()
                 .checkPermission(Manifest.permission.ACCESS_FINE_LOCATION,
@@ -97,6 +103,57 @@ public final class FeatureContextWrapperTest extends AndroidTestCase {
                         fContext.getPackageName()));
         assertEquals(PackageManager.PERMISSION_DENIED,
                 fContext.checkCallingOrSelfPermission(Manifest.permission.ACCESS_NETWORK_STATE));
+    }
+
+    @SmallTest
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.M)
+    public void testAllowedPermission_marshmallow() {
+        final FeatureContextWrapper fContext = new FeatureContextWrapper(getContext(),
+                null, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, null);
+
+        assertEquals(PackageManager.PERMISSION_GRANTED,
+                fContext.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION));
+
+        assertEquals(PackageManager.PERMISSION_DENIED,
+                fContext.checkSelfPermission(Manifest.permission.ACCESS_NETWORK_STATE));
+    }
+
+    @SmallTest
+    public void testRequestedPermission() throws PackageManager.NameNotFoundException {
+        final FeatureContextWrapper fContext = new FeatureContextWrapper(getContext(),
+                new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, null, null);
+
+        final PackageInfo info = fContext.getPackageManager()
+                .getPackageInfo(fContext.getPackageName(), PackageManager.GET_PERMISSIONS);
+
+        assertNotNull(info.requestedPermissions);
+        assertEquals(1, info.requestedPermissions.length);
+        assertEquals(Manifest.permission.ACCESS_FINE_LOCATION, info.requestedPermissions[0]);
+    }
+
+
+    @SmallTest
+    public void testRequestedPermission_null() throws PackageManager.NameNotFoundException {
+        final FeatureContextWrapper fContext = new FeatureContextWrapper(getContext(),
+                null, null, null);
+
+        final PackageInfo info = fContext.getPackageManager()
+                .getPackageInfo(fContext.getPackageName(), PackageManager.GET_PERMISSIONS);
+
+        assertNull(info.requestedPermissions);
+    }
+
+
+    @SmallTest
+    public void testRequestedPermission_empty() throws PackageManager.NameNotFoundException {
+        final FeatureContextWrapper fContext = new FeatureContextWrapper(getContext(),
+                new String[]{}, null, null);
+
+        final PackageInfo info = fContext.getPackageManager()
+                .getPackageInfo(fContext.getPackageName(), PackageManager.GET_PERMISSIONS);
+
+        assertNotNull(info.requestedPermissions);
+        assertEquals(0, info.requestedPermissions.length);
     }
 
 }

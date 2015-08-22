@@ -19,6 +19,7 @@ package com.twofortyfouram.test.context;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.ContextWrapper;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -30,7 +31,10 @@ import java.util.Arrays;
 
 /**
  * Context for faking environment capabilities and permissions. This allows dynamic feature
- * switching to be exercised in a test environment.
+ * scaling to be exercised in a test environment.
+ *
+ * Note: This class returns a mock {@code PackageManager} via {@link Context#getPackageManager()},
+ * which may not fully implement the PackageManager APIs.
  */
 @Immutable
 public final class FeatureContextWrapper extends ContextWrapper {
@@ -54,11 +58,17 @@ public final class FeatureContextWrapper extends ContextWrapper {
     private final PackageManager mMockPackageManager;
 
     /**
-     * @param baseContext        Base context to wrap.
-     * @param allowedPermissions Set of allowed permissions.
-     * @param availableFeatures  Set of available features.
+     * Note: There is no checking that {@code requestedPermissions} and {@code allowedPermissions}
+     * have sane values.  It is possible to construct an instance ofof this class that indicates
+     * permission is allowed even if not requested.
+     *
+     * @param baseContext          Base context to wrap.
+     * @param requestedPermissions Set of permissions requested (e.g. in the Android Manifest).
+     * @param allowedPermissions   Set of allowed permissions.
+     * @param availableFeatures    Set of available features.
      */
     public FeatureContextWrapper(final Context baseContext,
+            @Nullable final String[] requestedPermissions,
             @Nullable final String[] allowedPermissions,
             @Nullable final String[] availableFeatures) {
         super(baseContext);
@@ -74,6 +84,14 @@ public final class FeatureContextWrapper extends ContextWrapper {
             Arrays.sort(mAvailableFeatures);
         } else {
             mAvailableFeatures = null;
+        }
+
+        final String[] requestedPermissionsCopy;
+        if (null != requestedPermissions) {
+            requestedPermissionsCopy = copyArray(requestedPermissions);
+            Arrays.sort(requestedPermissionsCopy);
+        } else {
+            requestedPermissionsCopy = null;
         }
 
         mMockPackageManager = new MockPackageManager() {
@@ -98,6 +116,18 @@ public final class FeatureContextWrapper extends ContextWrapper {
             public int getComponentEnabledSetting(ComponentName componentName) {
                 return baseContext.getPackageManager().getComponentEnabledSetting(componentName);
             }
+
+            @Override
+            public PackageInfo getPackageInfo(String packageName, int flags)
+                    throws NameNotFoundException {
+                final PackageInfo packageInfo = new PackageInfo();
+
+                if (null != requestedPermissionsCopy) {
+                    packageInfo.requestedPermissions = copyArray(requestedPermissionsCopy);
+                }
+
+                return packageInfo;
+            }
         };
     }
 
@@ -108,6 +138,11 @@ public final class FeatureContextWrapper extends ContextWrapper {
 
     @Override
     public int checkCallingOrSelfPermission(final String permission) {
+        return checkPermissionInternal(permission);
+    }
+
+    @Override
+    public int checkSelfPermission(final String permission) {
         return checkPermissionInternal(permission);
     }
 
