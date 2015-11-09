@@ -71,7 +71,7 @@ public final class ActivityTestUtil {
      * @param activity Activity whose result code is to be obtained.
      * @return Result code of the Activity.
      */
-    public static int getActivityResultCode(@NonNull final Activity activity) {
+    private static int getActivityResultCode(@NonNull final Activity activity) {
         assertNotNull(activity, "activity"); //$NON-NLS-1$
 
         /*

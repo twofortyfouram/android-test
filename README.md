@@ -24,7 +24,7 @@ The build.gradle repositories section would look something like the following:
 And the dependencies section would look something like this:
 
     dependencies {
-        androidTestCompile group:'com.twofortyfouram', name:'android-test', version:'[3.0.0,4.0['
+        androidTestCompile group:'com.twofortyfouram', name:'android-test', version:'[4.0.0,5.0['
     }
 
 
@@ -35,3 +35,4 @@ And the dependencies section would look something like this:
 * 1.0.5: Reupload artifacts with source and JavaDoc for inclusion in jCenter
 * 2.0.0: Changed interface of ActivityTestUtil for the new AndroidJUnitRunner
 * 3.0.0: Changed interface of FeatureContextWrapper to support Android Marshmallow
+* 4.0.0: Removed ActivityTestUtil.getActivityResultCode(); getActivityResultCodeSync() is the correct public API to use.

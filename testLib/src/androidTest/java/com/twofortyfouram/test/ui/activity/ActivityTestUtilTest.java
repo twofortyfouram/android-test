@@ -26,14 +26,14 @@ import com.twofortyfouram.test.ActivityImpl;
 import com.twofortyfouram.test.assertion.MoarAsserts;
 
 // TODO: Convert this to Espresso style
-public final class ActivityTestHelperTest
+public final class ActivityTestUtilTest
         extends ActivityInstrumentationTestCase2<ActivityImpl> {
 
-    public ActivityTestHelperTest() {
+    public ActivityTestUtilTest() {
         super(ActivityImpl.class);
     }
 
-    public ActivityTestHelperTest(@NonNull final Class<ActivityImpl> activityClass) {
+    public ActivityTestUtilTest(@NonNull final Class<ActivityImpl> activityClass) {
         super(activityClass);
     }
 
