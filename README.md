@@ -1,10 +1,11 @@
-[![Build Status](https://travis-ci.org/twofortyfouram/android-test.png?branch=master)](https://travis-ci.org/twofortyfouram/android-test)
+[![CircleCI](https://circleci.com/gh/twofortyfouram/android-test.svg?style=svg)](https://circleci.com/gh/twofortyfouram/android-test)
+
 # Overview
 The android-test-lib implements a variety of classes to fill in gaps in the Android test framework.  This library is intended only to be used for test purposes.
 
 
 # API Reference
-JavaDocs for the library are published [here](http://twofortyfouram.github.io/android-test).
+JavaDocs for the library are published [here](https://twofortyfouram.github.io/android-test).
 
 
 # Compatibility
