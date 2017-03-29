@@ -1,5 +1,3 @@
-boolean is_jack = Boolean.parseBoolean(IS_JACK_ENABLED)
-
 apply plugin: 'com.android.library'
 apply plugin: 'maven'
 apply plugin: 'findbugs'
@@ -37,7 +35,7 @@ android.libraryVariants.all { variant ->
     task("${variant.name}Javadoc", type: Javadoc) {
         description "Generates Javadoc for $variant.name."
         def androidHome = System.getenv('ANDROID_HOME')
-source = variant.javaCompile.source
+        source = variant.javaCompile.source
         classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
         classpath += variant.javaCompile.classpath
         classpath += variant.javaCompile.outputs.files
