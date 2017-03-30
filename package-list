@@ -1,4 +1,7 @@
 com.twofortyfouram.test
-com.twofortyfouram.test.assertion
 com.twofortyfouram.test.context
+com.twofortyfouram.test.espresso
+com.twofortyfouram.test.matcher
+com.twofortyfouram.test.provider
 com.twofortyfouram.test.ui.activity
+com.twofortyfouram.test.util
