@@ -1,16 +1,17 @@
 /*
- * android-test-lib https://github.com/twofortyfouram/android-test
- * Copyright 2014 two forty four a.m. LLC
+ * android-test https://github.com/twofortyfouram/android-test
+ * Copyright (C) 2014–2017 two forty four a.m. LLC
  *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
- * in compliance with the License. You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+ * this file except in compliance with the License. You may obtain a copy of the
+ * License at
  *
  *  http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software distributed under the
- * License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
- * express or implied. See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software distributed
+ * under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+ * CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
  */
 
 package com.twofortyfouram.test.context;
@@ -25,6 +26,7 @@ import android.os.Handler;
 import android.os.UserHandle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 import net.jcip.annotations.Immutable;
 import net.jcip.annotations.NotThreadSafe;
@@ -68,24 +70,17 @@ public final class ReceiverContextWrapper extends ContextWrapper {
     }
 
     @Override
+    @SuppressWarnings("deprecation")
     public void sendStickyBroadcast(final Intent intent) {
-        mIntents.add(new SentIntent(intent, null, true, false));
+        throw new UnsupportedOperationException();
     }
 
     @Override
+    @SuppressWarnings("deprecation")
     public void sendStickyOrderedBroadcast(final Intent intent,
             final BroadcastReceiver resultReceiver, final Handler scheduler, final int initialCode,
             final String initialData, final Bundle initialExtras) {
-        mIntents.add(new SentIntent(intent, null, true, true));
-
-        scheduler.post(new Runnable() {
-            private final Intent mIntent = intent;
-
-            @Override
-            public void run() {
-                resultReceiver.onReceive(ReceiverContextWrapper.this, mIntent);
-            }
-        });
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -97,7 +92,7 @@ public final class ReceiverContextWrapper extends ContextWrapper {
     public void sendOrderedBroadcast(final Intent intent, String receiverPermission,
             final BroadcastReceiver resultReceiver, Handler scheduler, int initialCode,
             String initialData, Bundle initialExtras) {
-        mIntents.add(new SentIntent(intent, null, false, true));
+        mIntents.add(new SentIntent(intent, receiverPermission, false, true));
 
         scheduler.post(new Runnable() {
 
@@ -105,6 +100,7 @@ public final class ReceiverContextWrapper extends ContextWrapper {
 
             @Override
             public void run() {
+                Log.v("testLibTest", "Runnable running");
                 resultReceiver.onReceive(ReceiverContextWrapper.this, mIntent);
             }
         });
@@ -121,14 +117,8 @@ public final class ReceiverContextWrapper extends ContextWrapper {
     }
 
     @Override
+    @SuppressWarnings("deprecation")
     public void sendStickyBroadcastAsUser(Intent intent, UserHandle user) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void sendStickyOrderedBroadcastAsUser(Intent intent, UserHandle user,
-            BroadcastReceiver resultReceiver, Handler scheduler, int initialCode,
-            String initialData, Bundle initialExtras) {
         throw new UnsupportedOperationException();
     }
 
@@ -136,6 +126,14 @@ public final class ReceiverContextWrapper extends ContextWrapper {
     public void sendOrderedBroadcastAsUser(Intent intent, UserHandle user,
             String receiverPermission, BroadcastReceiver resultReceiver, Handler scheduler,
             int initialCode, String initialData, Bundle initialExtras) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    @SuppressWarnings("deprecation")
+    public void sendStickyOrderedBroadcastAsUser(Intent intent, UserHandle user,
+            BroadcastReceiver resultReceiver, Handler scheduler, int initialCode,
+            String initialData, Bundle initialExtras) {
         throw new UnsupportedOperationException();
     }
 

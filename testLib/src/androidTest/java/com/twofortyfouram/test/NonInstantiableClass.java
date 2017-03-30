@@ -16,11 +16,9 @@
 
 package com.twofortyfouram.test;
 
-import android.app.Activity;
+public final class NonInstantiableClass {
 
-/**
- * Activity implementation to exercise during tests.
- */
-public class ActivityImpl extends Activity {
-    // this space intentionally left blank
+    private NonInstantiableClass() {
+        throw new UnsupportedOperationException();
+    }
 }

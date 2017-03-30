@@ -1,68 +1,93 @@
 /*
- * android-test-lib https://github.com/twofortyfouram/android-test
- * Copyright 2014 two forty four a.m. LLC
+ * android-test https://github.com/twofortyfouram/android-test
+ * Copyright (C) 2014–2017 two forty four a.m. LLC
  *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
- * in compliance with the License. You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+ * this file except in compliance with the License. You may obtain a copy of the
+ * License at
  *
  *  http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software distributed under the
- * License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
- * express or implied. See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software distributed
+ * under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+ * CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
  */
 
 package com.twofortyfouram.test.context;
 
 
+import android.annotation.TargetApi;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.Build;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
-import android.test.AndroidTestCase;
-import android.test.MoreAsserts;
-import android.test.suitebuilder.annotation.MediumTest;
-import android.test.suitebuilder.annotation.SmallTest;
+import android.support.test.InstrumentationRegistry;
+import android.support.test.filters.MediumTest;
+import android.support.test.filters.SdkSuppress;
+import android.support.test.filters.SmallTest;
+import android.support.test.runner.AndroidJUnit4;
 import android.text.format.DateUtils;
 
+import org.hamcrest.Matchers;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
 import java.util.Collection;
+import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-public final class ReceiverContextWrapperTest extends AndroidTestCase {
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.sameInstance;
+import static org.junit.Assert.fail;
+
+@RunWith(AndroidJUnit4.class)
+public final class ReceiverContextWrapperTest {
 
     // TODO: These tests are not particularly DRY
 
     @SmallTest
-    public void testBreakOut() {
-        final ReceiverContextWrapper fContext = new ReceiverContextWrapper(getContext());
+    @Test
+    public void getApplicationContext_does_not_break_out() {
+        final ReceiverContextWrapper fContext = new ReceiverContextWrapper(
+                InstrumentationRegistry.getContext());
 
-        assertSame(fContext, fContext.getApplicationContext());
+        assertThat(fContext.getApplicationContext(),
+                Matchers.<Context>sameInstance(fContext));
     }
 
     @SmallTest
-    public void testGetAndClearEmpty() {
-        final ReceiverContextWrapper fContext = new ReceiverContextWrapper(getContext());
+    @Test
+    public void getAndClear_empty() {
+        final ReceiverContextWrapper fContext = new ReceiverContextWrapper(
+                InstrumentationRegistry.getContext());
 
         final Collection<ReceiverContextWrapper.SentIntent> intents = fContext
                 .getAndClearSentIntents();
-        assertNotNull(intents);
-        MoreAsserts.assertEmpty(intents);
+        assertThat(intents, notNullValue());
+        assertThat(intents, Matchers.<ReceiverContextWrapper.SentIntent>empty());
     }
 
     @MediumTest
-    public void testSendBroadcast() {
-        final ReceiverContextWrapper fContext = new ReceiverContextWrapper(getContext());
+    @Test
+    public void sendBroadcast_without_permission() {
+        final ReceiverContextWrapper fContext = new ReceiverContextWrapper(
+                InstrumentationRegistry.getContext());
 
         /*
          * Verifies the Intent is not broadcast to the rest of the system and the Intent is captured.
          */
-
-        final HandlerThread handlerThread = new HandlerThread(getName(),
+        final String name = UUID.randomUUID().toString();
+        final HandlerThread handlerThread = new HandlerThread(name,
                 android.os.Process.THREAD_PRIORITY_DEFAULT);
         handlerThread.start();
         try {
@@ -76,31 +101,32 @@ public final class ReceiverContextWrapperTest extends AndroidTestCase {
                 }
             };
 
-            final String intentAction = "com.twofortyfouram.test.intent.action." + getName();
+            final String intentAction = "com.twofortyfouram.test.intent.action." + name;
             final IntentFilter filter = new IntentFilter(intentAction);
-            getContext().registerReceiver(receiver, filter);
+            InstrumentationRegistry.getContext().registerReceiver(receiver, filter);
 
             final Intent intentToSend = new Intent(intentAction);
             fContext.sendBroadcast(intentToSend);
 
             try {
-                assertFalse(latch.await(DateUtils.SECOND_IN_MILLIS, TimeUnit.MILLISECONDS));
+                assertThat(latch.await(DateUtils.SECOND_IN_MILLIS, TimeUnit.MILLISECONDS),
+                        is(false));
             } catch (final InterruptedException e) {
                 fail(e.getMessage());
             } finally {
-                getContext().unregisterReceiver(receiver);
+                InstrumentationRegistry.getContext().unregisterReceiver(receiver);
             }
 
             final Collection<ReceiverContextWrapper.SentIntent> intents = fContext
                     .getAndClearSentIntents();
-            assertEquals(1, intents.size());
+            assertThat(intents.size(), is(1));
             for (final ReceiverContextWrapper.SentIntent i : intents) {
-                assertTrue(intentToSend.filterEquals(i.getIntent()));
-                assertNotSame(intentToSend, i.getIntent());
+                assertThat(intentToSend.filterEquals(i.getIntent()), is(true));
+                assertThat(i.getIntent(), not(sameInstance(intentToSend)));
 
-                assertNull(i.getPermission());
-                assertFalse(i.getIsSticky());
-                assertFalse(i.getIsOrdered());
+                assertThat(i.getPermission(), nullValue());
+                assertThat(i.getIsSticky(), is(false));
+                assertThat(i.getIsOrdered(), is(false));
             }
 
         } finally {
@@ -109,14 +135,16 @@ public final class ReceiverContextWrapperTest extends AndroidTestCase {
     }
 
     @MediumTest
-    public void testSendBroadcast_permission() {
-        final ReceiverContextWrapper fContext = new ReceiverContextWrapper(getContext());
+    @Test
+    public void sendBroadcast_with_permission() {
+        final ReceiverContextWrapper fContext = new ReceiverContextWrapper(
+                InstrumentationRegistry.getContext());
 
         /*
          * Verifies the Intent is not broadcast to the rest of the system and the Intent is captured.
          */
-
-        final HandlerThread handlerThread = new HandlerThread(getName(),
+        final String name = UUID.randomUUID().toString();
+        final HandlerThread handlerThread = new HandlerThread(name,
                 android.os.Process.THREAD_PRIORITY_DEFAULT);
         handlerThread.start();
         try {
@@ -130,32 +158,34 @@ public final class ReceiverContextWrapperTest extends AndroidTestCase {
                 }
             };
 
-            final String intentAction = "com.twofortyfouram.test.intent.action." + getName();
-            final String permissionString = "com.twofortyfouram.test.permission." + getName();
+            final String intentAction = "com.twofortyfouram.test.intent.action." + name;
+            final String permissionString = "com.twofortyfouram.test.permission." + name;
             final IntentFilter filter = new IntentFilter(intentAction);
-            getContext().registerReceiver(receiver, filter, permissionString, null);
+            InstrumentationRegistry.getContext()
+                    .registerReceiver(receiver, filter, permissionString, null);
 
             final Intent intentToSend = new Intent(intentAction);
             fContext.sendBroadcast(intentToSend, permissionString);
 
             try {
-                assertFalse(latch.await(DateUtils.SECOND_IN_MILLIS, TimeUnit.MILLISECONDS));
+                assertThat(latch.await(DateUtils.SECOND_IN_MILLIS, TimeUnit.MILLISECONDS),
+                        is(false));
             } catch (final InterruptedException e) {
                 fail(e.getMessage());
             } finally {
-                getContext().unregisterReceiver(receiver);
+                InstrumentationRegistry.getContext().unregisterReceiver(receiver);
             }
 
             final Collection<ReceiverContextWrapper.SentIntent> intents = fContext
                     .getAndClearSentIntents();
-            assertEquals(1, intents.size());
+            assertThat(intents.size(), is(1));
             for (final ReceiverContextWrapper.SentIntent i : intents) {
-                assertTrue(intentToSend.filterEquals(i.getIntent()));
-                assertNotSame(intentToSend, i.getIntent());
+                assertThat(intentToSend.filterEquals(i.getIntent()), is(true));
+                assertThat(i.getIntent(), not(sameInstance(intentToSend)));
 
-                assertEquals(permissionString, i.getPermission());
-                assertFalse(i.getIsSticky());
-                assertFalse(i.getIsOrdered());
+                assertThat(i.getPermission(), is(permissionString));
+                assertThat(i.getIsSticky(), is(false));
+                assertThat(i.getIsOrdered(), is(false));
             }
 
         } finally {
@@ -164,14 +194,16 @@ public final class ReceiverContextWrapperTest extends AndroidTestCase {
     }
 
     @MediumTest
-    public void testSendStickyBroadcast() {
-        final ReceiverContextWrapper fContext = new ReceiverContextWrapper(getContext());
+    @Test
+    public void sendOrderedBroadcast_without_result_receiver() {
+        final ReceiverContextWrapper fContext = new ReceiverContextWrapper(
+                InstrumentationRegistry.getContext());
 
         /*
          * Verifies the Intent is not broadcast to the rest of the system and the Intent is captured.
          */
-
-        final HandlerThread handlerThread = new HandlerThread(getName(),
+        final String name = UUID.randomUUID().toString();
+        final HandlerThread handlerThread = new HandlerThread(name,
                 android.os.Process.THREAD_PRIORITY_DEFAULT);
         handlerThread.start();
         try {
@@ -185,85 +217,32 @@ public final class ReceiverContextWrapperTest extends AndroidTestCase {
                 }
             };
 
-            final String intentAction = "com.twofortyfouram.test.intent.action." + getName();
+            final String intentAction = "com.twofortyfouram.test.intent.action." + name;
             final IntentFilter filter = new IntentFilter(intentAction);
-            getContext().registerReceiver(receiver, filter);
-
-            final Intent intentToSend = new Intent(intentAction);
-            fContext.sendStickyBroadcast(intentToSend);
-
-            try {
-                assertFalse(latch.await(DateUtils.SECOND_IN_MILLIS, TimeUnit.MILLISECONDS));
-            } catch (final InterruptedException e) {
-                fail(e.getMessage());
-            } finally {
-                getContext().unregisterReceiver(receiver);
-            }
-
-            final Collection<ReceiverContextWrapper.SentIntent> intents = fContext
-                    .getAndClearSentIntents();
-            assertEquals(1, intents.size());
-            for (final ReceiverContextWrapper.SentIntent i : intents) {
-                assertTrue(intentToSend.filterEquals(i.getIntent()));
-                assertNotSame(intentToSend, i.getIntent());
-
-                assertNull(i.getPermission());
-                assertTrue(i.getIsSticky());
-                assertFalse(i.getIsOrdered());
-            }
-
-        } finally {
-            handlerThread.getLooper().quit();
-        }
-    }
-
-    @MediumTest
-    public void testSendOrderedBroadcast() {
-        final ReceiverContextWrapper fContext = new ReceiverContextWrapper(getContext());
-
-        /*
-         * Verifies the Intent is not broadcast to the rest of the system and the Intent is captured.
-         */
-
-        final HandlerThread handlerThread = new HandlerThread(getName(),
-                android.os.Process.THREAD_PRIORITY_DEFAULT);
-        handlerThread.start();
-        try {
-
-            final CountDownLatch latch = new CountDownLatch(1);
-            final BroadcastReceiver receiver = new BroadcastReceiver() {
-
-                @Override
-                public void onReceive(Context context, Intent intent) {
-                    latch.countDown();
-                }
-            };
-
-            final String intentAction = "com.twofortyfouram.test.intent.action." + getName();
-            final IntentFilter filter = new IntentFilter(intentAction);
-            getContext().registerReceiver(receiver, filter);
+            InstrumentationRegistry.getContext().registerReceiver(receiver, filter);
 
             final Intent intentToSend = new Intent(intentAction);
             fContext.sendOrderedBroadcast(intentToSend, null);
 
             try {
-                assertFalse(latch.await(DateUtils.SECOND_IN_MILLIS, TimeUnit.MILLISECONDS));
+                assertThat(latch.await(DateUtils.SECOND_IN_MILLIS, TimeUnit.MILLISECONDS),
+                        is(false));
             } catch (final InterruptedException e) {
                 fail(e.getMessage());
             } finally {
-                getContext().unregisterReceiver(receiver);
+                InstrumentationRegistry.getContext().unregisterReceiver(receiver);
             }
 
             final Collection<ReceiverContextWrapper.SentIntent> intents = fContext
                     .getAndClearSentIntents();
-            assertEquals(1, intents.size());
+            assertThat(intents.size(), is(1));
             for (final ReceiverContextWrapper.SentIntent i : intents) {
-                assertTrue(intentToSend.filterEquals(i.getIntent()));
-                assertNotSame(intentToSend, i.getIntent());
+                assertThat(intentToSend.filterEquals(i.getIntent()), is(true));
+                assertThat(i.getIntent(), not(sameInstance(intentToSend)));
 
-                assertNull(i.getPermission());
-                assertFalse(i.getIsSticky());
-                assertTrue(i.getIsOrdered());
+                assertThat(i.getPermission(), nullValue());
+                assertThat(i.getIsSticky(), is(false));
+                assertThat(i.getIsOrdered(), is(true));
             }
 
         } finally {
@@ -272,140 +251,75 @@ public final class ReceiverContextWrapperTest extends AndroidTestCase {
     }
 
     @MediumTest
-    public void testSendOrderedBroadcast_with_result_receiver() {
-        final ReceiverContextWrapper fContext = new ReceiverContextWrapper(getContext());
+    @Test
+    public void sendOrderedBroadcast_with_result_receiver() {
+        final ReceiverContextWrapper fContext = new ReceiverContextWrapper(
+                InstrumentationRegistry.getContext());
 
         /*
          * Verifies the Intent is not broadcast to the rest of the system and the Intent is captured.
          */
-
-        final HandlerThread handlerThread = new HandlerThread(getName(),
+        final String name = UUID.randomUUID().toString();
+        final HandlerThread handlerThread = new HandlerThread(name,
                 android.os.Process.THREAD_PRIORITY_DEFAULT);
         handlerThread.start();
         try {
 
-            final CountDownLatch latch = new CountDownLatch(1);
-            final BroadcastReceiver receiver = new BroadcastReceiver() {
+            final CountDownLatch systemLatch = new CountDownLatch(1);
+            final BroadcastReceiver systemReceiver = new BroadcastReceiver() {
 
                 @Override
                 public void onReceive(Context context, Intent intent) {
-                    latch.countDown();
+                    systemLatch.countDown();
                 }
             };
 
-            final CountDownLatch resultLatch = new CountDownLatch(1);
-            final BroadcastReceiver resultReceiver = new BroadcastReceiver() {
+            final CountDownLatch fakeLatch = new CountDownLatch(1);
+            final BroadcastReceiver fakeReceiver = new BroadcastReceiver() {
 
                 @Override
                 public void onReceive(Context context, Intent intent) {
-                    assertSame(handlerThread.getLooper(), Looper.myLooper());
-                    resultLatch.countDown();
+                    assertThat(Looper.myLooper(), sameInstance(handlerThread.getLooper()));
+                    fakeLatch.countDown();
                 }
             };
 
-            final String intentAction = "com.twofortyfouram.test.intent.action." + getName();
+            final String intentAction = "com.twofortyfouram.test.intent.action." + name;
             final IntentFilter filter = new IntentFilter(intentAction);
-            getContext().registerReceiver(receiver, filter);
+            InstrumentationRegistry.getContext().registerReceiver(systemReceiver, filter);
 
             final Intent intentToSend = new Intent(intentAction);
-            fContext.sendOrderedBroadcast(intentToSend, null, resultReceiver,
+            fContext.sendOrderedBroadcast(intentToSend, null, fakeReceiver,
                     new Handler(handlerThread.getLooper()), 0, null, null);
 
+            // Not sent to the entire system
             try {
-                assertFalse(latch.await(DateUtils.SECOND_IN_MILLIS, TimeUnit.MILLISECONDS));
+                assertThat(systemLatch.await(DateUtils.SECOND_IN_MILLIS, TimeUnit.MILLISECONDS),
+                        is(false));
             } catch (final InterruptedException e) {
                 fail(e.getMessage());
             } finally {
-                getContext().unregisterReceiver(receiver);
+                InstrumentationRegistry.getContext().unregisterReceiver(systemReceiver);
             }
 
+            // Sent to the fake systemReceiver
             try {
-                assertTrue(resultLatch.await(DateUtils.SECOND_IN_MILLIS, TimeUnit.MILLISECONDS));
+                assertThat(fakeLatch.await(DateUtils.SECOND_IN_MILLIS, TimeUnit.MILLISECONDS),
+                        is(true));
             } catch (final InterruptedException e) {
                 fail(e.getMessage());
             }
 
             final Collection<ReceiverContextWrapper.SentIntent> intents = fContext
                     .getAndClearSentIntents();
-            assertEquals(1, intents.size());
+            assertThat(intents.size(), is(1));
             for (final ReceiverContextWrapper.SentIntent i : intents) {
-                assertTrue(intentToSend.filterEquals(i.getIntent()));
-                assertNotSame(intentToSend, i.getIntent());
+                assertThat(intentToSend.filterEquals(i.getIntent()), is(true));
+                assertThat(i.getIntent(), not(sameInstance(intentToSend)));
 
-                assertNull(i.getPermission());
-                assertFalse(i.getIsSticky());
-                assertTrue(i.getIsOrdered());
-            }
-
-        } finally {
-            handlerThread.getLooper().quit();
-        }
-    }
-
-    @MediumTest
-    public void testSendStickyOrderedBroadcast() {
-        final ReceiverContextWrapper fContext = new ReceiverContextWrapper(getContext());
-
-        /*
-         * Verifies the Intent is not broadcast to the rest of the system and the Intent is captured.
-         */
-
-        final HandlerThread handlerThread = new HandlerThread(getName(),
-                android.os.Process.THREAD_PRIORITY_DEFAULT);
-        handlerThread.start();
-        try {
-
-            final CountDownLatch latch = new CountDownLatch(1);
-            final BroadcastReceiver receiver = new BroadcastReceiver() {
-
-                @Override
-                public void onReceive(Context context, Intent intent) {
-                    latch.countDown();
-                }
-            };
-
-            final CountDownLatch resultLatch = new CountDownLatch(1);
-            final BroadcastReceiver resultReceiver = new BroadcastReceiver() {
-
-                @Override
-                public void onReceive(Context context, Intent intent) {
-                    assertSame(handlerThread.getLooper(), Looper.myLooper());
-                    resultLatch.countDown();
-                }
-            };
-
-            final String intentAction = "com.twofortyfouram.test.intent.action." + getName();
-            final IntentFilter filter = new IntentFilter(intentAction);
-            getContext().registerReceiver(receiver, filter);
-
-            final Intent intentToSend = new Intent(intentAction);
-            fContext.sendStickyOrderedBroadcast(intentToSend, resultReceiver,
-                    new Handler(handlerThread.getLooper()), 0, null, null);
-
-            try {
-                assertFalse(latch.await(DateUtils.SECOND_IN_MILLIS, TimeUnit.MILLISECONDS));
-            } catch (final InterruptedException e) {
-                fail(e.getMessage());
-            } finally {
-                getContext().unregisterReceiver(receiver);
-            }
-
-            try {
-                assertTrue(resultLatch.await(DateUtils.SECOND_IN_MILLIS, TimeUnit.MILLISECONDS));
-            } catch (final InterruptedException e) {
-                fail(e.getMessage());
-            }
-
-            final Collection<ReceiverContextWrapper.SentIntent> intents = fContext
-                    .getAndClearSentIntents();
-            assertEquals(1, intents.size());
-            for (final ReceiverContextWrapper.SentIntent i : intents) {
-                assertTrue(intentToSend.filterEquals(i.getIntent()));
-                assertNotSame(intentToSend, i.getIntent());
-
-                assertNull(i.getPermission());
-                assertTrue(i.getIsSticky());
-                assertTrue(i.getIsOrdered());
+                assertThat(i.getPermission(), nullValue());
+                assertThat(i.getIsSticky(), is(false));
+                assertThat(i.getIsOrdered(), is(true));
             }
 
         } finally {
@@ -414,66 +328,51 @@ public final class ReceiverContextWrapperTest extends AndroidTestCase {
     }
 
     @SmallTest
-    public void testSendBroadcastAsUser() {
-        final ReceiverContextWrapper fContext = new ReceiverContextWrapper(getContext());
-
-        try {
-            fContext.sendBroadcastAsUser(new Intent(), null);
-            fail();
-        } catch (UnsupportedOperationException e) {
-            // Expected exception
-        }
+    @Test(expected = UnsupportedOperationException.class)
+    public void sendBroadcastAsUser_without_permission() {
+        final ReceiverContextWrapper fContext = new ReceiverContextWrapper(
+                InstrumentationRegistry.getContext());
+        fContext.sendBroadcastAsUser(new Intent(), null);
     }
 
     @SmallTest
-    public void testSendBroadcastAsUser_permission() {
-        final ReceiverContextWrapper fContext = new ReceiverContextWrapper(getContext());
-
-        try {
-            fContext.sendBroadcastAsUser(new Intent(), null, null);
-            fail();
-        } catch (UnsupportedOperationException e) {
-            // Expected exception
-        }
+    @Test(expected = UnsupportedOperationException.class)
+    public void sendBroadcastAsUser_with_permission() {
+        final ReceiverContextWrapper fContext = new ReceiverContextWrapper(
+                InstrumentationRegistry.getContext());
+        fContext.sendBroadcastAsUser(new Intent(), null, null);
     }
 
 
     @SmallTest
-    public void testSendStickyBroadcastAsUser() {
-        final ReceiverContextWrapper fContext = new ReceiverContextWrapper(getContext());
-
-        try {
-            fContext.sendStickyBroadcastAsUser(new Intent(), null);
-            fail();
-        } catch (UnsupportedOperationException e) {
-            // Expected exception
-        }
+    @Test(expected = UnsupportedOperationException.class)
+    public void sendStickyBroadcastAsUser_throw() {
+        final ReceiverContextWrapper fContext = new ReceiverContextWrapper(
+                InstrumentationRegistry.getContext());
+        fContext.sendStickyBroadcastAsUser(new Intent(), null);
     }
 
     @SmallTest
-    public void testSendStickyOrderedBroadcastAsUser() {
-        final ReceiverContextWrapper fContext = new ReceiverContextWrapper(getContext());
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.JELLY_BEAN_MR1)
+    @SuppressWarnings("deprecation")
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
+    @Test(expected = UnsupportedOperationException.class)
+    public void sendStickyOrderedBroadcastAsUser_throw() {
+        final ReceiverContextWrapper fContext = new ReceiverContextWrapper(
+                InstrumentationRegistry.getContext());
 
-        try {
-            fContext.sendStickyOrderedBroadcastAsUser(new Intent(), null, null, null, 0, null,
-                    null);
-            fail();
-        } catch (UnsupportedOperationException e) {
-            // Expected exception
-        }
+        fContext.sendStickyOrderedBroadcastAsUser(new Intent(), null, null, null, 0, null,
+                null);
     }
 
     @SmallTest
-    public void testSendOrderedBroadcastAsUser() {
-        final ReceiverContextWrapper fContext = new ReceiverContextWrapper(getContext());
-
-        try {
-            fContext.sendOrderedBroadcastAsUser(new Intent(), null, null, null, null, 0, null,
-                    null);
-            fail();
-        } catch (UnsupportedOperationException e) {
-            // Expected exception
-        }
+    @Test(expected = UnsupportedOperationException.class)
+    @SuppressWarnings("deprecation")
+    public void sendOrderedBroadcastAsUser_throw() {
+        final ReceiverContextWrapper fContext = new ReceiverContextWrapper(
+                InstrumentationRegistry.getContext());
+        fContext.sendOrderedBroadcastAsUser(new Intent(), null, null, null, null, 0, null,
+                null);
     }
 
 }

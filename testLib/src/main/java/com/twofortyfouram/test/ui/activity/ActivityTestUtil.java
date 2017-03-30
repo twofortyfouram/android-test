@@ -1,16 +1,17 @@
 /*
- * android-test-lib https://github.com/twofortyfouram/android-test
- * Copyright 2014 two forty four a.m. LLC
+ * android-test https://github.com/twofortyfouram/android-test
+ * Copyright (C) 2014–2017 two forty four a.m. LLC
  *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
- * in compliance with the License. You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+ * this file except in compliance with the License. You may obtain a copy of the
+ * License at
  *
  *  http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software distributed under the
- * License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
- * express or implied. See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software distributed
+ * under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+ * CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
  */
 
 package com.twofortyfouram.test.ui.activity;
@@ -40,8 +41,9 @@ public final class ActivityTestUtil {
 
     /**
      * Gets the Activity result code, syncing automatically if not called on the UI thread.
+     *
      * @param instrumentation Instrumentation to handle threading.
-     * @param activity Activity whose result code is to be obtained.
+     * @param activity        Activity whose result code is to be obtained.
      * @return Result code of the Activity.
      */
     public static int getActivityResultCodeSync(@NonNull final Instrumentation instrumentation,
@@ -71,7 +73,7 @@ public final class ActivityTestUtil {
      * @param activity Activity whose result code is to be obtained.
      * @return Result code of the Activity.
      */
-    private static int getActivityResultCode(@NonNull final Activity activity) {
+    public static int getActivityResultCode(@NonNull final Activity activity) {
         assertNotNull(activity, "activity"); //$NON-NLS-1$
 
         /*
@@ -95,7 +97,7 @@ public final class ActivityTestUtil {
      * Gets the Activity result Intent, syncing automatically if not called on the UI thread.
      *
      * @param instrumentation Instrumentation to handle threading.
-     * @param activity Activity whose result code is to be obtained.
+     * @param activity        Activity whose result code is to be obtained.
      * @return Result code of the Activity.
      */
     public static Intent getActivityResultDataSync(@NonNull final Instrumentation instrumentation,
@@ -150,10 +152,12 @@ public final class ActivityTestUtil {
     /**
      * Executes a runnable on the main thread. This method works even if the current thread is
      * already the main thread.
+     *
      * @param instrumentation to handle threading.
-     * @param runnable to execute.
+     * @param runnable        to execute.
      */
-    /*package*/ static void autoSyncRunnable(@NonNull final Instrumentation instrumentation,
+    /*package*/
+    static void autoSyncRunnable(@NonNull final Instrumentation instrumentation,
             @NonNull final Runnable runnable) {
         if (Looper.getMainLooper() == Looper.myLooper()) {
             runnable.run();

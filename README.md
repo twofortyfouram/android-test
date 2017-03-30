@@ -1,7 +1,7 @@
 [![CircleCI](https://circleci.com/gh/twofortyfouram/android-test.svg?style=svg)](https://circleci.com/gh/twofortyfouram/android-test)
 
 # Overview
-The android-test-lib implements a variety of classes to fill in gaps in the Android test framework.  This library is intended only to be used for test purposes.
+android-test implements a variety of classes to fill in gaps in the Android test framework.  This library is intended only to be used for test purposes.
 
 
 # API Reference
@@ -9,7 +9,7 @@ JavaDocs for the library are published [here](https://twofortyfouram.github.io/a
 
 
 # Compatibility
-The library is compatible and optimized for Android API Level 8 and above.
+The library is compatible and optimized for Android API Level 9 and above.
 
 
 # Download
@@ -26,6 +26,7 @@ And the dependencies section would look something like this:
 
     dependencies {
         androidTestCompile group:'com.twofortyfouram', name:'android-test', version:'[4.0.0,5.0['
+        androidTestCompile group:'com.twofortyfouram', name:'android-assertion', version:'[1.2.0,2.0['
     }
 
 
@@ -37,3 +38,9 @@ And the dependencies section would look something like this:
 * 2.0.0: Changed interface of ActivityTestUtil for the new AndroidJUnitRunner
 * 3.0.0: Changed interface of FeatureContextWrapper to support Android Marshmallow
 * 4.0.0: Removed ActivityTestUtil.getActivityResultCode(); getActivityResultCodeSync() is the correct public API to use.
+* 5.0.0: Bring in latest changes from Locale
+    * Added MockableContentProvider to assist in mocking content provider calls
+    * Added utility classes to detect Firebase Test Lab and Test Butler
+    * Delete MoarAsserts
+    * Moved FeatureContextWrapper and ReceiverContextWrapper
+    * Min API 9

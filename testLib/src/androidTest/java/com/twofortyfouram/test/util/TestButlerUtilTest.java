@@ -14,13 +14,25 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package com.twofortyfouram.test;
+package com.twofortyfouram.test.util;
 
-import android.app.Activity;
 
-/**
- * Activity implementation to exercise during tests.
- */
-public class ActivityImpl extends Activity {
-    // this space intentionally left blank
+import android.support.test.filters.SmallTest;
+import android.support.test.runner.AndroidJUnit4;
+
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
+import static com.twofortyfouram.test.matcher.ClassNotInstantiableMatcher.notInstantiable;
+import static org.hamcrest.MatcherAssert.assertThat;
+
+@RunWith(AndroidJUnit4.class)
+public final class TestButlerUtilTest {
+
+    @Test
+    @SmallTest
+    public void nonInstantiable() {
+        assertThat(TestButlerUtil.class, notInstantiable());
+    }
+
 }

@@ -1,16 +1,17 @@
 /*
- * android-test-lib https://github.com/twofortyfouram/android-test
- * Copyright 2014 two forty four a.m. LLC
+ * android-test https://github.com/twofortyfouram/android-test
+ * Copyright (C) 2014–2017 two forty four a.m. LLC
  *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
- * in compliance with the License. You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+ * this file except in compliance with the License. You may obtain a copy of the
+ * License at
  *
  *  http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software distributed under the
- * License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
- * express or implied. See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software distributed
+ * under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+ * CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
  */
 
 package com.twofortyfouram.test.context;
@@ -23,7 +24,6 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.test.mock.MockPackageManager;
 
 import net.jcip.annotations.Immutable;
 
@@ -59,7 +59,7 @@ public final class FeatureContextWrapper extends ContextWrapper {
 
     /**
      * Note: There is no checking that {@code requestedPermissions} and {@code allowedPermissions}
-     * have sane values.  It is possible to construct an instance ofof this class that indicates
+     * have sane values.  It is possible to construct an instance of this class that indicates
      * permission is allowed even if not requested.
      *
      * @param baseContext          Base context to wrap.
@@ -67,7 +67,7 @@ public final class FeatureContextWrapper extends ContextWrapper {
      * @param allowedPermissions   Set of allowed permissions.
      * @param availableFeatures    Set of available features.
      */
-    public FeatureContextWrapper(final Context baseContext,
+    public FeatureContextWrapper(@NonNull final Context baseContext,
             @Nullable final String[] requestedPermissions,
             @Nullable final String[] allowedPermissions,
             @Nullable final String[] availableFeatures) {
@@ -94,41 +94,7 @@ public final class FeatureContextWrapper extends ContextWrapper {
             requestedPermissionsCopy = null;
         }
 
-        mMockPackageManager = new MockPackageManager() {
-            @Override
-            public int checkPermission(final String permName, final String pkgName) {
-                return checkPermissionInternal(permName);
-            }
-
-            @Override
-            public boolean hasSystemFeature(final String featureName) {
-                return checkFeatureInternal(featureName);
-            }
-
-            @Override
-            public void setComponentEnabledSetting(ComponentName componentName, int newState,
-                    int flags) {
-                baseContext.getPackageManager().setComponentEnabledSetting(componentName, newState,
-                        flags);
-            }
-
-            @Override
-            public int getComponentEnabledSetting(ComponentName componentName) {
-                return baseContext.getPackageManager().getComponentEnabledSetting(componentName);
-            }
-
-            @Override
-            public PackageInfo getPackageInfo(String packageName, int flags)
-                    throws NameNotFoundException {
-                final PackageInfo packageInfo = new PackageInfo();
-
-                if (null != requestedPermissionsCopy) {
-                    packageInfo.requestedPermissions = copyArray(requestedPermissionsCopy);
-                }
-
-                return packageInfo;
-            }
-        };
+        mMockPackageManager = new MyMockPackageManager(baseContext, requestedPermissionsCopy);
     }
 
     @Override
@@ -185,5 +151,54 @@ public final class FeatureContextWrapper extends ContextWrapper {
         System.arraycopy(toCopy, 0, dest, 0, toCopy.length);
 
         return dest;
+    }
+
+
+    @SuppressWarnings("deprecation")
+    private class MyMockPackageManager extends android.test.mock.MockPackageManager {
+
+        private final Context mBaseContext;
+
+        private final String[] mRequestedPermissionsCopy;
+
+        public MyMockPackageManager(final Context baseContext,
+                final String[] requestedPermissionsCopy) {
+            mBaseContext = baseContext;
+            mRequestedPermissionsCopy = requestedPermissionsCopy;
+        }
+
+        @Override
+        public int checkPermission(final String permName, final String pkgName) {
+            return checkPermissionInternal(permName);
+        }
+
+        @Override
+        public boolean hasSystemFeature(final String featureName) {
+            return checkFeatureInternal(featureName);
+        }
+
+        @Override
+        public void setComponentEnabledSetting(ComponentName componentName, int newState,
+                int flags) {
+            mBaseContext.getPackageManager().setComponentEnabledSetting(componentName, newState,
+                    flags);
+        }
+
+        @Override
+        public int getComponentEnabledSetting(ComponentName componentName) {
+            return mBaseContext.getPackageManager().getComponentEnabledSetting(componentName);
+        }
+
+        @Override
+        public PackageInfo getPackageInfo(String packageName, int flags)
+                throws NameNotFoundException {
+            final PackageInfo packageInfo = new PackageInfo();
+
+            if (null != mRequestedPermissionsCopy) {
+                packageInfo.requestedPermissions = copyArray(mRequestedPermissionsCopy);
+            }
+
+            return packageInfo;
+        }
     }
 }

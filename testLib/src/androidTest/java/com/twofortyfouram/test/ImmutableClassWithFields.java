@@ -16,11 +16,10 @@
 
 package com.twofortyfouram.test;
 
-import android.app.Activity;
+import javax.annotation.concurrent.Immutable;
 
-/**
- * Activity implementation to exercise during tests.
- */
-public class ActivityImpl extends Activity {
-    // this space intentionally left blank
+@Immutable
+public final class ImmutableClassWithFields {
+
+    private final Object mObject = new Object();
 }

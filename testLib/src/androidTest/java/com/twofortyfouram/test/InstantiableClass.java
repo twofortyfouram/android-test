@@ -16,11 +16,9 @@
 
 package com.twofortyfouram.test;
 
-import android.app.Activity;
+public final class InstantiableClass {
 
-/**
- * Activity implementation to exercise during tests.
- */
-public class ActivityImpl extends Activity {
-    // this space intentionally left blank
+    public InstantiableClass() {
+
+    }
 }
