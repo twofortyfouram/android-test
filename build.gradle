@@ -2,8 +2,8 @@ apply plugin: 'com.github.ben-manes.versions'
 
 buildscript {
     repositories {
-        jcenter()
         google()
+        jcenter()
     }
     dependencies {
         classpath group:'com.android.tools.build', name:'gradle', version:"${ANDROID_GRADLE_PLUGIN_VERSION_MATCHER}"
@@ -13,8 +13,8 @@ buildscript {
 
 allprojects {
     repositories {
-        jcenter()
         google()
+        jcenter()
     }
 
     // Forces all dependencies to be resolved.  Useful in continuous integration
