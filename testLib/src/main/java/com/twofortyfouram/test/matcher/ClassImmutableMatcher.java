@@ -19,8 +19,6 @@ package com.twofortyfouram.test.matcher;
 
 import android.support.annotation.NonNull;
 
-import com.twofortyfouram.assertion.Assertions;
-
 import net.jcip.annotations.ThreadSafe;
 
 import org.hamcrest.Description;
@@ -32,6 +30,8 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
+
+import static com.twofortyfouram.assertion.Assertions.assertNotNull;
 
 /**
  * Matcher to verify that a class is probably immutable.  Typical use case is for model objects
@@ -53,8 +53,8 @@ public final class ClassImmutableMatcher extends TypeSafeDiagnosingMatcher<Class
     @Override
     protected boolean matchesSafely(@NonNull final Class<?> cls,
             @NonNull final Description description) {
-        Assertions.assertNotNull(cls, "cls"); //$NON-NLS
-        Assertions.assertNotNull(description, "description"); //$NON-NLS
+        assertNotNull(cls, "cls"); //$NON-NLS
+        assertNotNull(description, "description"); //$NON-NLS
 
         final Collection<Field> nonFinalFields = getNonFinalFields(cls);
         if (!nonFinalFields.isEmpty()) {
@@ -69,7 +69,7 @@ public final class ClassImmutableMatcher extends TypeSafeDiagnosingMatcher<Class
 
     /*package*/
     static Collection<Field> getNonFinalFields(@NonNull final Class<?> cls) {
-        Assertions.assertNotNull(cls, "cls"); //$NON-NLS
+        assertNotNull(cls, "cls"); //$NON-NLS
 
         final List<Field> nonFinalFields = new LinkedList<>();
 

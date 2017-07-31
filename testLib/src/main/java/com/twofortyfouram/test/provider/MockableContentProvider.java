@@ -16,6 +16,7 @@
 
 package com.twofortyfouram.test.provider;
 
+import android.annotation.SuppressLint;
 import android.content.ContentProvider;
 import android.content.ContentValues;
 import android.content.Context;
@@ -44,6 +45,9 @@ import static com.twofortyfouram.assertion.Assertions.assertNotNull;
  * manually.  To bypass this limitation, consider using the helper method
  * {@link #newMockProvider(Context, String)}.
  */
+// This is a mock object to be used at runtime, so lint warnings about registration should be
+// ignored
+@SuppressLint("Registered")
 @NotThreadSafe
 public final class MockableContentProvider extends ContentProvider {
 
@@ -485,7 +489,7 @@ public final class MockableContentProvider extends ContentProvider {
         @NonNull
         private final ContentValues mContentValues;
 
-        @NonNull
+        @Nullable
         private final String mSelection;
 
         @NonNull

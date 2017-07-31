@@ -18,6 +18,7 @@ package com.twofortyfouram.test.context;
 
 
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.Intent;
@@ -45,7 +46,7 @@ import java.util.LinkedList;
 public final class ReceiverContextWrapper extends ContextWrapper {
 
     @NonNull
-    private final Collection<SentIntent> mIntents = new LinkedList<SentIntent>();
+    private final LinkedList<SentIntent> mIntents = new LinkedList<>();
 
     public ReceiverContextWrapper(@NonNull final Context targetContext) {
         super(targetContext);
@@ -137,20 +138,35 @@ public final class ReceiverContextWrapper extends ContextWrapper {
         throw new UnsupportedOperationException();
     }
 
+    @Override
+    public ComponentName startService(final Intent service) {
+        mIntents.add(new SentIntent(service, null, false, false));
+        return null;
+    }
+
     @NonNull
     public Collection<SentIntent> getAndClearSentIntents() {
         try {
-            return new LinkedList<SentIntent>(mIntents);
+            return new LinkedList<>(mIntents);
         } finally {
             mIntents.clear();
         }
     }
 
     /**
+     * @return Polls the oldest Intent sent through this context.  May be null if no Intents are
+     * remaining to be polled.
+     */
+    @Nullable
+    public SentIntent pollIntent() {
+        return mIntents.poll();
+    }
+
+    /**
      * Represents an Intent that was sent through
      */
     @Immutable
-    public final class SentIntent {
+    public static final class SentIntent {
 
         @NonNull
         private final Intent mIntent;

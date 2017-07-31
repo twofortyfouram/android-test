@@ -35,7 +35,10 @@ import static com.twofortyfouram.assertion.Assertions.assertNotNull;
 
 /**
  * Utility class to facilitate Activity testing.
+ *
+ * This can now be accomplished with {@link android.support.test.rule.ActivityTestRule}.
  */
+@Deprecated
 @ThreadSafe
 public final class ActivityTestUtil {
 
@@ -51,6 +54,7 @@ public final class ActivityTestUtil {
         assertNotNull(instrumentation, "instrumentation"); //$NON-NLS-1$
         assertNotNull(activity, "activity"); //$NON-NLS-1$
 
+        //noinspection ObjectEquality
         if (Looper.getMainLooper() == Looper.myLooper()) {
             return getActivityResultCode(activity);
         } else {
@@ -86,7 +90,7 @@ public final class ActivityTestUtil {
             final Field resultCodeField = Activity.class
                     .getDeclaredField("mResultCode"); //$NON-NLS-1$
             resultCodeField.setAccessible(true);
-            return ((Integer) resultCodeField.get(activity)).intValue();
+            return (Integer) resultCodeField.get(activity);
         } catch (final Exception e) {
             throw new RuntimeException(e);
         }
@@ -105,6 +109,7 @@ public final class ActivityTestUtil {
         assertNotNull(instrumentation, "instrumentation"); //$NON-NLS-1$
         assertNotNull(activity, "activity"); //$NON-NLS-1$
 
+        //noinspection ObjectEquality
         if (Looper.getMainLooper() == Looper.myLooper()) {
             return getActivityResultData(activity);
         } else {
@@ -159,6 +164,7 @@ public final class ActivityTestUtil {
     /*package*/
     static void autoSyncRunnable(@NonNull final Instrumentation instrumentation,
             @NonNull final Runnable runnable) {
+        //noinspection ObjectEquality
         if (Looper.getMainLooper() == Looper.myLooper()) {
             runnable.run();
         } else {

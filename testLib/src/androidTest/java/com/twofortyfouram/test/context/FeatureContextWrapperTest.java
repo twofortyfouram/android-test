@@ -34,6 +34,7 @@ import static android.support.test.InstrumentationRegistry.getContext;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.arrayContaining;
 import static org.hamcrest.Matchers.arrayWithSize;
+import static org.hamcrest.Matchers.emptyArray;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 
@@ -180,7 +181,7 @@ public final class FeatureContextWrapperTest {
                 .getPackageInfo(fContext.getPackageName(), PackageManager.GET_PERMISSIONS);
 
         assertThat(info.requestedPermissions, notNullValue());
-        assertThat(info.requestedPermissions, Matchers.<String>emptyArray());
+        assertThat(info.requestedPermissions, emptyArray());
     }
 
 }

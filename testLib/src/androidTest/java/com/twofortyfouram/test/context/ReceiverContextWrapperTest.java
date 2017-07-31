@@ -43,6 +43,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
@@ -74,7 +75,7 @@ public final class ReceiverContextWrapperTest {
         final Collection<ReceiverContextWrapper.SentIntent> intents = fContext
                 .getAndClearSentIntents();
         assertThat(intents, notNullValue());
-        assertThat(intents, Matchers.<ReceiverContextWrapper.SentIntent>empty());
+        assertThat(intents, empty());
     }
 
     @MediumTest
@@ -373,6 +374,22 @@ public final class ReceiverContextWrapperTest {
                 InstrumentationRegistry.getContext());
         fContext.sendOrderedBroadcastAsUser(new Intent(), null, null, null, null, 0, null,
                 null);
+    }
+
+    @SmallTest
+    @Test
+    public void startService() {
+        final ReceiverContextWrapper context = new ReceiverContextWrapper(
+                InstrumentationRegistry.getContext());
+
+        context.startService(new Intent("foo")); //$NON-NLS
+
+        final ReceiverContextWrapper.SentIntent polledIntent = context.pollIntent();
+        assertThat(polledIntent, notNullValue());
+
+        assertThat(polledIntent.getIntent().getAction(), is("foo")); //$NON-NLS
+
+        assertThat(context.pollIntent(), nullValue());
     }
 
 }

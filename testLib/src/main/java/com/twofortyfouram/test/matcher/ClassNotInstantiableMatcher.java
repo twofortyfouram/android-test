@@ -19,8 +19,6 @@ package com.twofortyfouram.test.matcher;
 
 import android.support.annotation.NonNull;
 
-import com.twofortyfouram.assertion.Assertions;
-
 import net.jcip.annotations.ThreadSafe;
 
 import org.hamcrest.Description;
@@ -28,6 +26,8 @@ import org.hamcrest.TypeSafeDiagnosingMatcher;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+
+import static com.twofortyfouram.assertion.Assertions.assertNotNull;
 
 /**
  * Matcher to verify that a class is not instantiable.  Typical use case is for utility classes
@@ -49,8 +49,8 @@ public final class ClassNotInstantiableMatcher extends TypeSafeDiagnosingMatcher
     @Override
     protected boolean matchesSafely(@NonNull final Class<?> cls,
             @NonNull final Description description) {
-        Assertions.assertNotNull(cls, "cls"); //$NON-NLS
-        Assertions.assertNotNull(description, "description"); //$NON-NLS
+        assertNotNull(cls, "cls"); //$NON-NLS
+        assertNotNull(description, "description"); //$NON-NLS
 
         if (0 > getNumberOfPublicConstructors(cls)) {
             description.appendText("Class has public constructors"); //$NON-NLS
@@ -67,13 +67,13 @@ public final class ClassNotInstantiableMatcher extends TypeSafeDiagnosingMatcher
     }
 
     private static int getNumberOfPublicConstructors(@NonNull final Class<?> cls) {
-        Assertions.assertNotNull(cls, "cls"); //$NON-NLS
+        assertNotNull(cls, "cls"); //$NON-NLS
 
         return cls.getConstructors().length;
     }
 
     private static boolean isPrivateConstructorAccessible(@NonNull final Class<?> cls) {
-        Assertions.assertNotNull(cls, "cls"); //$NON-NLS
+        assertNotNull(cls, "cls"); //$NON-NLS
 
         try {
             final Constructor<?> constructor = cls.getDeclaredConstructor();

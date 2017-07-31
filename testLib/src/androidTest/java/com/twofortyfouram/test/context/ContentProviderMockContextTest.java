@@ -60,8 +60,7 @@ public final class ContentProviderMockContextTest {
                         new ContentProviderImpl()));
 
         final Cursor result = fContext.getContentResolver()
-                .query(new Uri.Builder().authority("authority").build(), null, null, null, null,
-                        null);
+                .query(new Uri.Builder().authority("authority").build(), null, null, null, null);
 
         assertThat(result, nullValue());
     }

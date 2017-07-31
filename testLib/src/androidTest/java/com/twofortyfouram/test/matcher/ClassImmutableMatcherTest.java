@@ -23,13 +23,11 @@ import com.twofortyfouram.test.AccidentallyMutableClass;
 import com.twofortyfouram.test.ImmutableClassWithFields;
 import com.twofortyfouram.test.ImmutableClassWithoutFields;
 
-import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import java.lang.reflect.Field;
-
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.not;
 
@@ -40,14 +38,14 @@ public final class ClassImmutableMatcherTest {
     @Test
     public void hasFinalFields_with_fields_true() {
         assertThat(ClassImmutableMatcher.getNonFinalFields(ImmutableClassWithFields.class),
-                Matchers.<Field>empty());
+                empty());
     }
 
     @SmallTest
     @Test
     public void hasFinalFields_without_fields_true() {
         assertThat(ClassImmutableMatcher.getNonFinalFields(ImmutableClassWithoutFields.class),
-                Matchers.<Field>empty());
+                empty());
     }
 
     @SmallTest

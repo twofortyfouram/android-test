@@ -9,7 +9,7 @@ JavaDocs for the library are published [here](https://twofortyfouram.github.io/a
 
 
 # Compatibility
-The library is compatible and optimized for Android API Level 9 and above.
+The library is compatible and optimized for Android API Level 15 and above.
 
 
 # Download
@@ -25,8 +25,8 @@ The build.gradle repositories section would look something like the following:
 And the dependencies section would look something like this:
 
     dependencies {
-        androidTestCompile group:'com.twofortyfouram', name:'android-test', version:'[4.0.0,5.0['
-        androidTestCompile group:'com.twofortyfouram', name:'android-assertion', version:'[1.2.0,2.0['
+        androidTestCompile group:'com.twofortyfouram', name:'android-test', version:'[6.0.0,7.0)'
+        androidTestCompile group:'com.twofortyfouram', name:'android-assertion', version:'[1.2.0,3.0)'
     }
 
 
@@ -44,3 +44,9 @@ And the dependencies section would look something like this:
     * Delete MoarAsserts
     * Moved FeatureContextWrapper and ReceiverContextWrapper
     * Min API 9
+* 6.0.0: Bring in latest changes from Locale
+    * Espresso 3.0.0
+    * Min API 15
+    * Deprecated ActivityTestUtil in favor of ActivityTestRule
+    * Added UtcRule
+    * Added service starts to ReceiverContextWrapper

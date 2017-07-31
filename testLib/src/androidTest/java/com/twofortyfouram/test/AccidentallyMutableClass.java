@@ -18,8 +18,11 @@ package com.twofortyfouram.test;
 
 import javax.annotation.concurrent.Immutable;
 
+// This class is supposed to generate a warning.
+@SuppressWarnings("NonFinalFieldInImmutable")
 @Immutable
 public final class AccidentallyMutableClass {
 
+    @SuppressWarnings("FieldMayBeFinal")
     private Object mObject = new Object();
 }
