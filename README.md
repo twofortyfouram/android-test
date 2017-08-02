@@ -25,8 +25,8 @@ The build.gradle repositories section would look something like the following:
 And the dependencies section would look something like this:
 
     dependencies {
-        androidTestCompile group:'com.twofortyfouram', name:'android-test', version:'[6.0.0,7.0)'
-        androidTestCompile group:'com.twofortyfouram', name:'android-assertion', version:'[1.2.0,3.0)'
+        androidTestCompile group:'com.twofortyfouram', name:'android-test', version:'[6.0.1,7.0)'
+        androidTestCompile group:'com.twofortyfouram', name:'android-assertion', version:'[2.0.0,3.0)'
     }
 
 
